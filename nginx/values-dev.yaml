@@ -1,5 +1,0 @@
-namespace: "dev"
-
-ingress:
-    path: "/(reports-dev/)(.*)"
-
