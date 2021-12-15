@@ -11,7 +11,7 @@ spec:
   source:
     repoURL: https://gitlab.com/kushalbavkar/deployments.git
     targetRevision: HEAD
-    path: config
+    chart: nginx    
   destination:
     server: https://kubernetes.default.svc
     namespace: helm
