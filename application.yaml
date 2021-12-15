@@ -9,7 +9,7 @@ spec:
   project: default
 
   source:
-    repoURL: https://gitlab.com/kushalbavkar/deployments.git
+    repoURL: https://github.com/kushalbavkar/deployments.git
     targetRevision: HEAD
     path: dev
   destination:
