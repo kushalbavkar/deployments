@@ -1,0 +1,5 @@
+namespace: "prod"
+
+ingress:
+    path: "/(reports-prod/)(.*)"
+
