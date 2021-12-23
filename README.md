@@ -10,4 +10,4 @@ Mostly using **Helm** as package manager to deploy application in local Kubernet
 
 ## Future implementation 
 
-#### Plan is to use `ArgoCD` to automated deployments to K8s cluster
+#### Plan is to use **ArgoCD** for automated deployments to K8s cluster
