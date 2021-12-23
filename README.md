@@ -1,8 +1,13 @@
-# deployments
+# Application deployments
 
-Project for deploying application inside Kubernetes cluster.
+Project containing deployment descriptors (manifest) files for application deployments.
 
-Uses Helm for deployment of applications under the following namespaces -
+Mostly using **Helm** as package manager to deploy application in local Kubernetes cluster.
 
-	1. dev
-	2. prod
+## Installation
+
+     $ helm install {release.name} {chart.directory}
+
+## Future implementation 
+
+#### Plan is to use `ArgoCD` to automated deployments to K8s cluster
