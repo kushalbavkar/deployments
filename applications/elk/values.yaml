@@ -1,0 +1,57 @@
+namespace: "helm"
+
+elasticsearch:
+  configmap:
+    name: "elasticsearch"
+
+  deployment:
+    name: "elasticsearch"
+    image: "elasticsearch"
+    tag: "7.16.2"
+    api:
+      port: 9200
+    node:
+      port: 9300
+
+  service:
+    name: "elasticsearch"
+    port: 9200
+
+logstash:
+  configmap:
+    name: "logstash"
+
+  deployment:
+    name: "logstash"
+    image: "logstash"
+    tag: "7.16.2"
+    api:
+      port: 9600
+    udp:
+      port: 5014
+
+  service:
+    name: "logstash"
+    api:
+      port: 9600
+    udp:
+      port: 5014
+
+kibana:
+  configmap:
+    name: "kibana"
+
+  deployment:
+    name: "kibana"
+    image: "kibana"
+    tag: "7.16.2"
+    port: 5601
+
+  service:
+    name: "kibana"
+    port: 5601
+
+  ingress:
+    name: "kibana"
+    host: "kibana-dashboard.com"
+    path: "/(kibana)(/|$)(.*)"

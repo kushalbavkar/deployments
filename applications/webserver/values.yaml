@@ -11,10 +11,10 @@ deployment:
     
 service:
     name: "report-service"
-    port: 81
+    port: 80
     
 ingress:
     name: "report-ingress"
     host: "report-viewer.com"
-    path: "/(reports/)(.*)"
+    path: "/(reports)(/|$)(.*)"
     

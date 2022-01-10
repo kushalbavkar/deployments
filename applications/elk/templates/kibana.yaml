@@ -1,0 +1,93 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.kibana.configmap.name }}
+  namespace: {{ .Values.namespace }}
+data:
+  kibana.yml: |
+    server.host: "0.0.0.0"
+    server.name: kibana
+    server.basePath: /kibana
+    elasticsearch.hosts: ["http://{{ .Values.elasticsearch.service.name }}:9200"]
+    telemetry.enabled: false
+    newsfeed.enabled: false
+    
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.kibana.service.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.kibana.deployment.name }}
+spec:
+  clusterIP: None
+  selector:
+    app: {{ .Values.kibana.deployment.name }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.kibana.service.port }}
+      targetPort: {{ .Values.kibana.deployment.port }}
+      
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.kibana.deployment.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.kibana.deployment.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.kibana.deployment.name }}
+  strategy:
+    type: Recreate      
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.kibana.deployment.name }}
+        tier: frontend
+    spec:
+      containers:
+      - name: kibana
+        image: {{ .Values.kibana.deployment.image }}:{{ .Values.kibana.deployment.tag }}
+        ports:
+        - containerPort: {{ .Values.kibana.deployment.port }}
+          name: api
+          protocol: TCP
+        volumeMounts:
+        - name: config-volume
+          mountPath: /usr/share/kibana/config        
+      volumes:
+      - name: config-volume
+        configMap:
+          name: {{ .Values.kibana.configmap.name }}
+          items:
+          - key: kibana.yml
+            path: kibana.yml
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.kibana.ingress.name }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$3
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/x-forwarded-prefix: /$1
+spec:
+  rules:
+  - host: {{ .Values.kibana.ingress.host }}
+    http:
+      paths:
+      - path: {{ .Values.kibana.ingress.path }}
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Values.kibana.service.name }}
+            port:
+              number: {{ .Values.kibana.service.port }}            

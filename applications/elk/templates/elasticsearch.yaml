@@ -1,0 +1,78 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.elasticsearch.configmap.name }}
+  namespace: {{ .Values.namespace }}
+data:
+  elasticsearch.yml: |
+    discovery.type: single-node
+    network.host: 0.0.0.0
+    ingest.geoip.downloader.enabled: false    
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.elasticsearch.service.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.elasticsearch.deployment.name }}
+spec:
+  selector:
+    app: {{ .Values.elasticsearch.deployment.name }}
+  ports:
+    - name: api
+      protocol: TCP
+      port: {{ .Values.elasticsearch.service.port }}
+      targetPort: {{ .Values.elasticsearch.deployment.api.port }}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.elasticsearch.deployment.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.elasticsearch.deployment.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.elasticsearch.deployment.name }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.elasticsearch.deployment.name }}
+    spec:
+      containers:
+      - name: elasticsearch
+        image: {{ .Values.elasticsearch.deployment.image }}:{{ .Values.elasticsearch.deployment.tag }}
+        ports:
+        - containerPort: {{ .Values.elasticsearch.deployment.api.port }}
+          name: api
+          protocol: TCP
+        - containerPort: {{ .Values.elasticsearch.deployment.node.port }}
+          name: inter-node
+          protocol: TCP
+        volumeMounts:
+        - name: config-volume
+          mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
+          subPath: elasticsearch.yml
+          readOnly: true
+        env:
+        - name: node.name
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: ES_JAVA_OPTS
+          value: "-Xms512m -Xmx512m -XX:+UseG1GC"
+      volumes:
+      - name: config-volume
+        configMap:
+          name: {{ .Values.elasticsearch.configmap.name }}
+          items:
+          - key: elasticsearch.yml
+            path: elasticsearch.yml
