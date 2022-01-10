@@ -11,7 +11,7 @@ data:
   logstash.conf: |
     input {
       tcp {
-        port => {{ .Values.logstash.service.udp.port }}
+        port => {{ .Values.logstash.service.tcp.port }}
         codec => json_lines
       }
     }
@@ -35,7 +35,6 @@ metadata:
   labels:
     app: {{ .Values.logstash.deployment.name }}
 spec:
-  clusterIP: None
   selector:
     app: {{ .Values.logstash.deployment.name }}
   ports:
@@ -43,10 +42,10 @@ spec:
       protocol: TCP
       port: {{ .Values.logstash.service.api.port }}
       targetPort: {{ .Values.logstash.deployment.api.port }}
-    - name: udp-login
-      protocol: UDP
-      port: {{ .Values.logstash.service.udp.port }}
-      targetPort: {{ .Values.logstash.deployment.udp.port }}
+    - name: tcp-login
+      protocol: TCP
+      port: {{ .Values.logstash.service.tcp.port }}
+      targetPort: {{ .Values.logstash.deployment.tcp.port }}
 
 ---
 apiVersion: apps/v1
@@ -76,9 +75,9 @@ spec:
         - containerPort: {{ .Values.logstash.deployment.api.port }}
           name: api
           protocol: TCP
-        - containerPort: {{ .Values.logstash.deployment.udp.port }}
-          name: udp-login
-          protocol: UDP
+        - containerPort: {{ .Values.logstash.deployment.tcp.port }}
+          name: tcp-login
+          protocol: TCP
         volumeMounts:
         - name: config-volume
           mountPath: /usr/share/logstash/config

@@ -22,7 +22,6 @@ metadata:
   labels:
     app: {{ .Values.kibana.deployment.name }}
 spec:
-  clusterIP: None
   selector:
     app: {{ .Values.kibana.deployment.name }}
   ports:

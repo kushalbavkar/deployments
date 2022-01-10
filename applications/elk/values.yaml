@@ -27,14 +27,14 @@ logstash:
     tag: "7.16.2"
     api:
       port: 9600
-    udp:
+    tcp:
       port: 5014
 
   service:
     name: "logstash"
     api:
       port: 9600
-    udp:
+    tcp:
       port: 5014
 
 kibana:
